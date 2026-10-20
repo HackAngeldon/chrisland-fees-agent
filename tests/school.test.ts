@@ -92,3 +92,16 @@ test("parent emails are invented: a plus address on the test inbox, or example.c
   assert.equal(parentEmail(s("CHR-1103"), undefined), "parent.bello@example.com");
   assert.equal(parentEmail(s("CHR-1103"), "not an email"), "parent.bello@example.com");
 });
+
+test("an empty or malformed DEMO_TODAY falls back to the real Lagos date (found live: .env ships it empty)", async () => {
+  const { today } = await import("../src/tools.ts");
+  const saved = process.env.DEMO_TODAY;
+  try {
+    process.env.DEMO_TODAY = "";
+    assert.match(today(), /^\d{4}-\d{2}-\d{2}$/);
+    process.env.DEMO_TODAY = "soon";
+    assert.match(today(), /^\d{4}-\d{2}-\d{2}$/);
+    process.env.DEMO_TODAY = "2026-10-20";
+    assert.equal(today(), "2026-10-20");
+  } finally { process.env.DEMO_TODAY = saved; }
+});

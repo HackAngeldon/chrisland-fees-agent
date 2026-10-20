@@ -26,7 +26,10 @@ import { capture } from "./capture.js";
 
 /** Today in Lagos as YYYY-MM-DD. DEMO_TODAY pins it for tests and the recording. */
 export function today(): string {
-  return process.env.DEMO_TODAY ?? new Intl.DateTimeFormat("en-CA", { timeZone: "Africa/Lagos" }).format(new Date());
+  // An empty DEMO_TODAY (as .env.example ships it) means "not pinned", not "the empty date".
+  const pinned = process.env.DEMO_TODAY?.trim();
+  if (pinned && /^\d{4}-\d{2}-\d{2}$/.test(pinned)) return pinned;
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "Africa/Lagos" }).format(new Date());
 }
 
 type Json = Record<string, unknown>;
