@@ -36,7 +36,9 @@ Three small things in one screen (Team > Create a teammate, uploading `skill/` a
 - **Workaround:** The parent replies "paid" and the agent verifies with Paystack. Reminders stay as drafts for the office.
 - **Change in Chord:** Let an event subscription target a thread or sender ("deliver result to conversation X"), or document how to resolve a WhatsApp sender to a `conversation_id`.
 
-## Custom tools require a public MCP server
+## The docs describe MCP tools only; the app also has REST tools
 
-- **Observation:** There is no plain HTTP tool. Every custom tool is a remote MCP server on a public HTTPS URL; loopback is blocked, so a local build needs a deploy or a tunnel before the first test.
-- **Change in Chord:** A "test against localhost" path in development, or a hosted HTTP-tool option for simple REST calls.
+- **What happened:** From the API docs (Teammates > MCP connections), I took custom tools to mean MCP servers only, and built an MCP server. In the app, Admin > Channels & Tools > Tools also offers **Custom tools (API)**: declare a REST endpoint by hand or import an OpenAPI file. I could find neither in the docs index.
+- **Why it matters:** For a single REST call, the API option is a shorter path. MCP still suits this build: two endpoints with separate tokens keep the bursar's report out of the parents' agent.
+- **Also:** both need a public HTTPS URL (loopback is blocked), so a local build needs a deploy or a tunnel before the first test.
+- **Change in Chord:** List Custom tools (API) and OpenAPI import in the docs next to MCP connections, with when to choose which.

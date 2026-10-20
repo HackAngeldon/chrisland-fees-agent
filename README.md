@@ -27,6 +27,7 @@ Bursar ◄── Chord teammate "Accounts desk" ◄── daily schedule ──�
 - **Least privilege by endpoint, not by prompt.** The parents' teammate is connected only to `/mcp/parents`. The bursar's report sits on `/mcp/bursar`, with its own token, so no wording a parent sends can reach other families' balances.
 - **The parent is verified by student ID plus registered phone**, on every call (the server is stateless). Chord's docs do not say whether a tool learns the WhatsApp sender. `CAPTURE_REQUESTS=1` records what Chord actually sends, to find out (see `docs/field-notes.md`). Five failed checks lock a student ID for 15 minutes.
 - **Money paths fail safe.** Creating a payment never retries: a retry after a timeout can create a second charge. Reads retry once. Every Paystack failure becomes a plain sentence for the parent, never a raw error or a key, and a refused key is escalated to the office.
+- **Not Chord's built-in Paystack connector.** A generic connector lets the model choose the amount to charge. Here the server works out every amount from the school's rules and the verified family, so the model can only pick from options the rules allow.
 - **Test mode is enforced in code**: a secret key that is not `sk_test_` stops the server from starting.
 
 ## Run it
