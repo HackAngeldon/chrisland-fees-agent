@@ -10,7 +10,12 @@
 import { listSuccessful, type Transaction } from "./paystack.js";
 import { TERMS, type RecordedPayment, type TermId } from "./school.js";
 
-export const SCHOOL_TAG = "chrisland-demo";
+/**
+ * The tag that marks this school's transactions in Paystack metadata. Changing
+ * LEDGER_TAG starts a clean ledger on the same Paystack account (old payments
+ * stop counting), which resets the demo balances before reviewers test.
+ */
+export const SCHOOL_TAG = process.env.LEDGER_TAG?.trim() || "chrisland-demo";
 /** The session's fees can only have been paid from here on. */
 const SESSION_OPENED = "2026-08-01T00:00:00.000Z";
 const CACHE_MS = 10_000;

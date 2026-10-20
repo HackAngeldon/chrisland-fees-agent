@@ -46,14 +46,35 @@ Chord needs a **public HTTPS** URL (it blocks loopback). On Render: **New > Blue
 
 ## Connect it to Chord
 
-1. Register two MCP servers in the workspace, each `transport: streamable_http` and `auth_type: bearer`:
-   - **Fees tools (parents)**: `https://<host>/mcp/parents`, with `PARENTS_TOKEN`.
-   - **Fees tools (bursar)**: `https://<host>/mcp/bursar`, with `BURSAR_TOKEN`.
+The order matters: in Chord, a teammate with no MCP assignment gets every enabled server, and the app has no way to set one (see `docs/field-notes.md`, note 2).
 
-   Run discovery and a health check on each.
-2. Create the **fees assistant** teammate from `skill/` (SKILL.md and references). Assign only the parents server (`set_mcp_server_ids`).
-3. Create the **accounts desk** teammate from `skill-bursar/`. Assign only the bursar server, and add a daily 08:00 `Africa/Lagos` schedule: "Write the morning fees report."
-4. Connect the fees assistant to the WhatsApp simulator.
+1. **Admin > Channels & Tools > Tools > Custom tools (MCP) > Add server**, twice, both `streamable_http` with `bearer` auth:
+   - **Fees tools (parents)**: `https://<host>/mcp/parents` with `PARENTS_TOKEN`. Allowed tools: `verify_parent, get_fee_balance, create_payment_link, check_payment`.
+   - **Fees tools (bursar)**: `https://<host>/mcp/bursar` with `BURSAR_TOKEN`. Allowed tools: `outstanding_report`. Create it with **Enabled off**.
+2. **Team > Create a teammate** from `skill/` (as a ZIP) for the **Fees Assistant**, and from `skill-bursar/` for the **Accounts Desk**.
+3. **Pin each teammate to its server** through the API, with a key scoped to Teammates Read and Update only:
+   ```bash
+   npx tsx --env-file=.env scripts/chord.ts teammates
+   npx tsx --env-file=.env scripts/chord.ts pin <fees-assistant-id> <parents-server-id>
+   npx tsx --env-file=.env scripts/chord.ts pin <accounts-desk-id> <bursar-server-id>
+   ```
+   Pin Chord's default teammate to the parents server as well, then switch the bursar server on.
+4. Give the Accounts Desk a daily 08:00 `Africa/Lagos` schedule: "Write the morning fees report."
+5. Connect the Fees Assistant to the WhatsApp simulator.
+
+**Reset the demo balances** before a new round of testing: set `LEDGER_TAG` to a new value (for example `chrisland-demo-2`) and redeploy. Payments made under the old tag stop counting.
+
+**Keep it awake** during review: `.github/workflows/keep-warm.yml` pings `/health` every 10 minutes, because Render's free plan sleeps when idle.
+
+## Tested live
+
+Through Chord's in-app chat, against the deployed server and Paystack test mode (20 October 2026):
+
+- **Verify and balance.** Mr Okafor is verified, and Amara's balance is read correctly, including the "one payment left" rule.
+- **Declined card.** The agent says no money was taken and offers only the options the rules allow.
+- **Successful payment.** A ₦300,000 link (₦302,000 at checkout) is paid with Paystack's Success option. The receipt shows ₦300,000 for fees, Paystack's ₦2,000 on its own line, and a balance of ₦0.
+- **Siblings.** Mrs Bello is verified, and Daniel's balance comes back with his sister Aisha offered.
+- **Cost.** About 0.08 credits per reply.
 
 ## Test data
 

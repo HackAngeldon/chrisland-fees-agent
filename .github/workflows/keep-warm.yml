@@ -1,0 +1,23 @@
+# Render's free plan sleeps after 15 idle minutes and takes up to a minute to
+# wake, longer than a tool call should wait. While reviewers are testing, ping
+# the health check every 10 minutes so the first WhatsApp message gets an answer.
+# Free on a public repo. Disable the workflow after the review.
+name: keep-warm
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Ping /health
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 90 https://chrisland-fees-agent.onrender.com/health)
+          echo "health: $code"
+          test "$code" = "200"

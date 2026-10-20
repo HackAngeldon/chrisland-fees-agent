@@ -1,5 +1,0 @@
-# Role and problem statement (draft)
-
-**Role:** Technical Product Management (also open to Forward-deployed Engineering).
-
-Chrisland Schools is a private school group in Lagos, with campuses from crèche to Sixth Form, whose published rules ask parents to pay fees by certified bank draft on or before the first day of each term. In practice the accounts office chases balances one family at a time, and Lagos proprietors say arrears pile up by mid-term until payroll is at risk (BusinessDay, September 2025). This agent lets a parent ask "how much do I owe?" on WhatsApp, verifies them, quotes the exact balance and due date, and takes the payment through Paystack, confirmed and receipted in the same chat; each morning the bursar gets who owes, with reminders drafted. It is worth paying for because every naira collected on time is cash the school does not have to chase, and every reconciliation the office no longer does by hand is staff time back. I deliberately left out check-in alerts, recording bank transfers in chat, refunds and discounts: they need the school's own systems or a person's judgement.
