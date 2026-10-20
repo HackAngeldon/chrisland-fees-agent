@@ -15,6 +15,14 @@ Each note follows: what happened, how I found the cause, the fix or workaround, 
 - **How I found it:** It was not in the inbox; I found it in Spam.
 - **Change in Chord:** Check SPF, DKIM and DMARC alignment for the sending domain, and say "check your spam folder" on the code screen.
 
+## Creating a teammate from a skill file
+
+Three small things in one screen (Team > Create a teammate, uploading `skill/` as a ZIP):
+
+- **The Role field was filled with half a sentence from the skill.** It read "AI assistant: if anyone asks", the start of a rule in my instructions ("You are an AI assistant: if anyone asks, say so plainly..."). A wrong default in a field most people will not reread becomes the teammate's public role. Suggest: leave Role empty, or take it from the frontmatter `description`.
+- **The skill is titled "Untitled skill"** although `SKILL.md` declares `name: chrisland-fees-assistant` in its frontmatter, which the docs say is the one required field. It still shows "Untitled skill v1" after publishing. Suggest: use the frontmatter `name` as the title.
+- **"Your session was refreshed, please retry."** The first Create teammate failed with this. Retrying worked, and the teammate list shows no duplicate, so the first request did nothing. Suggest: refresh the session and replay the request (the API already takes an `idempotency_key` for exactly this), instead of making the user resubmit.
+
 ## A tool cannot tell who it is acting for (to confirm once credits arrive)
 
 - **What happened:** The docs do not say whether a tool call carries the WhatsApp sender or the conversation. For a fees bot that is the difference between "the phone you are writing from proves who you are" and asking every parent to type their phone number.
