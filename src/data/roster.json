@@ -1,0 +1,55 @@
+{
+  "_note": "Invented data for the TSG Labs exercise. No real student, parent, phone number or balance. Phone numbers use the +234 800 range so none reaches a real mobile. Parent emails are made up at run time (TEST_INBOX).",
+  "students": [
+    {
+      "id": "CHR-1042", "name": "Tobi Adeyemi", "class": "Year 4", "band": "primary", "campus": "Opebi",
+      "newStudent": false, "scholarship": false,
+      "parent": { "name": "Funke Adeyemi", "phone": "+2348000000101" },
+      "payments": [
+        { "term": "2026-27-T1", "amount": 1300000, "method": "bank_draft", "ref": "DRAFT-0098812", "date": "2026-09-02" }
+      ]
+    },
+    {
+      "id": "CHR-1057", "name": "Amara Okafor", "class": "Year 2", "band": "primary", "campus": "Opebi",
+      "newStudent": false, "scholarship": false,
+      "parent": { "name": "Chidi Okafor", "phone": "+2348000000102" },
+      "payments": [
+        { "term": "2026-27-T1", "amount": 600000, "method": "bank_draft", "ref": "DRAFT-0099120", "date": "2026-09-08" }
+      ]
+    },
+    {
+      "id": "CHR-1103", "name": "Daniel Bello", "class": "Year 6", "band": "primary", "campus": "Opebi",
+      "newStudent": false, "scholarship": false,
+      "parent": { "name": "Halima Bello", "phone": "+2348000000103" },
+      "payments": []
+    },
+    {
+      "id": "CHR-1150", "name": "Aisha Bello", "class": "Nursery 2", "band": "nursery", "campus": "Opebi",
+      "newStudent": false, "scholarship": false,
+      "parent": { "name": "Halima Bello", "phone": "+2348000000103" },
+      "payments": [
+        { "term": "2026-27-T1", "amount": 500000, "method": "bank_draft", "ref": "DRAFT-0099377", "date": "2026-09-10" }
+      ]
+    },
+    {
+      "id": "CHR-2011", "name": "Emeka Nwosu", "class": "Year 3", "band": "primary", "campus": "Lekki",
+      "newStudent": true, "scholarship": false,
+      "parent": { "name": "Ngozi Nwosu", "phone": "+2348000000104" },
+      "payments": []
+    },
+    {
+      "id": "CHR-1120", "name": "Kemi Johnson", "class": "JSS 2", "band": "secondary", "campus": "Opebi",
+      "newStudent": false, "scholarship": false,
+      "parent": { "name": "Tunde Johnson", "phone": "+2348000000105" },
+      "payments": [
+        { "term": "2026-27-T1", "amount": 800000, "method": "bank_draft", "ref": "DRAFT-0098540", "date": "2026-09-01" }
+      ]
+    },
+    {
+      "id": "CHR-1088", "name": "Zainab Lawal", "class": "SS 1", "band": "secondary", "campus": "Opebi",
+      "newStudent": false, "scholarship": true,
+      "parent": { "name": "Musa Lawal", "phone": "+2348000000106" },
+      "payments": []
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+# Render Blueprint: one web service for the tool server Chord calls.
+# Render generates both tokens; set PAYSTACK_SECRET_KEY (a TEST key), TEST_INBOX
+# and PUBLIC_BASE_URL in the dashboard when it asks.
+services:
+  - type: web
+    name: chrisland-fees-agent
+    runtime: node
+    plan: free # sleeps after 15 idle minutes; see README for the cold-start note
+    region: frankfurt # the closest Render region to Lagos
+    buildCommand: npm ci --include=dev && npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: PARENTS_TOKEN
+        generateValue: true
+      - key: BURSAR_TOKEN
+        generateValue: true
+      - key: PAYSTACK_SECRET_KEY
+        sync: false
+      - key: TEST_INBOX
+        sync: false
+      - key: PUBLIC_BASE_URL
+        sync: false
+      - key: CAPTURE_REQUESTS
+        value: "1"

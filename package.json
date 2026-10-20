@@ -1,0 +1,27 @@
+{
+  "name": "chrisland-fees-agent",
+  "version": "1.0.0",
+  "description": "A WhatsApp school fees assistant on Chord, with a Paystack (test mode) MCP tool server. TSG Labs build exercise.",
+  "scripts": {
+    "dev": "tsx watch --env-file=.env src/main.ts",
+    "start": "node dist/main.js",
+    "build": "tsc -p .",
+    "typecheck": "tsc -p . --noEmit",
+    "test": "tsx --test tests/*.test.ts",
+    "smoke": "tsx --env-file=.env scripts/smoke.ts"
+  },
+  "type": "module",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.1",
+    "zod": "3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "24.9.1",
+    "tsx": "4.20.6",
+    "typescript": "5.9.3"
+  },
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  }
+}
