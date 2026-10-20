@@ -76,14 +76,14 @@ test("the balance includes payments Paystack confirmed, and says so when Paystac
   fakePaystack({ successes: [tx({ reference: "CHR-1057-T1-OK", studentId: "CHR-1057", amountNaira: 200_000 }), tx({ reference: "OTHER", studentId: "CHR-1057", amountNaira: 999, school: "someone-else" })] });
   const c = await connect("/mcp/parents", PARENTS);
   const b = await call(c, "get_fee_balance", { student_id: "CHR-1057", phone: "+2348000000102" });
-  assert.equal(b.current_term.paid, "₦800,000");
-  assert.equal(b.current_term.outstanding, "₦500,000");
+  assert.equal(b.current_term.paid, "₦1,200,000");
+  assert.equal(b.current_term.outstanding, "₦100,000");
   assert.equal(b.current_term.status, "part_paid");
   assert.equal(b.next_term.total, "₦900,000");
   forgetCache();
   fakePaystack({ listFails: 503 });
   const degraded = await call(c, "get_fee_balance", { student_id: "CHR-1057", phone: "+2348000000102" });
-  assert.equal(degraded.current_term.outstanding, "₦700,000", "bank drafts still count");
+  assert.equal(degraded.current_term.outstanding, "₦300,000", "bank drafts still count");
   assert.match(degraded.warning, /could not be checked/);
   await c.close();
 });
@@ -120,7 +120,7 @@ test("when Paystack refuses the key, the parent hears it is unavailable and the 
 });
 
 test("check_payment: a receipt and the new balance on success; failed, unfinished, unknown and other merchants' payments each answered", async () => {
-  const paid = tx({ reference: "CHR-1057-T1-PAID", studentId: "CHR-1057", amountNaira: 700_000 });
+  const paid = tx({ reference: "CHR-1057-T1-PAID", studentId: "CHR-1057", amountNaira: 300_000 });
   fakePaystack({
     successes: [paid],
     verify: {
@@ -133,7 +133,7 @@ test("check_payment: a receipt and the new balance on success; failed, unfinishe
   const c = await connect("/mcp/parents", PARENTS);
   const ok = await call(c, "check_payment", { reference: "CHR-1057-T1-PAID" });
   assert.equal(ok.paid, true);
-  assert.equal(ok.receipt.amount, "₦700,000");
+  assert.equal(ok.receipt.amount, "₦300,000");
   assert.match(ok.receipt.student, /Amara Okafor \(CHR-1057\)/);
   assert.deepEqual([ok.balance_after.outstanding, ok.balance_after.status], ["₦0", "paid"]);
   const failed = await call(c, "check_payment", { reference: "CHR-1103-T1-FAIL" });
@@ -155,7 +155,7 @@ test("the bursar's report lists who owes, most overdue first, with totals", asyn
   assert.equal(r.totals.students, 7);
   assert.equal(r.totals.paid_in_full, 1);
   assert.equal(r.totals.owing, 6);
-  assert.equal(r.totals.outstanding, "₦5,250,000");
+  assert.equal(r.totals.outstanding, "₦4,850,000");
   assert.equal(r.owing[0].days_overdue, 43);
   const lekki = await call(c, "outstanding_report", { campus: "lekki" });
   assert.deepEqual(lekki.owing.map((o: any) => o.student_id), ["CHR-2011"]);
@@ -171,11 +171,11 @@ test("captured requests keep headers for the field notes, with the token removed
 });
 
 test("a parent who pays Paystack's fee on top: fees are credited with the asked amount, the charge shows on its own line", async () => {
-  const paid = tx({ reference: "CHR-1057-T1-FEE", studentId: "CHR-1057", amountNaira: 700_000, feeNaira: 2_000 });
+  const paid = tx({ reference: "CHR-1057-T1-FEE", studentId: "CHR-1057", amountNaira: 300_000, feeNaira: 2_000 });
   fakePaystack({ successes: [paid], verify: { "CHR-1057-T1-FEE": paid } });
   const c = await connect("/mcp/parents", PARENTS);
   const r = await call(c, "check_payment", { reference: "CHR-1057-T1-FEE" });
-  assert.deepEqual([r.receipt.amount, r.receipt.paystack_charge, r.receipt.total_charged], ["₦700,000", "₦2,000", "₦702,000"]);
+  assert.deepEqual([r.receipt.amount, r.receipt.paystack_charge, r.receipt.total_charged], ["₦300,000", "₦2,000", "₦302,000"]);
   assert.deepEqual([r.balance_after.outstanding, r.balance_after.status], ["₦0", "paid"], "not overpaid by the fee");
   await c.close();
 });
@@ -196,7 +196,7 @@ test("can_pay lists only what the rules allow: last payment clears, part payment
   fakePaystack();
   const c = await connect("/mcp/parents", PARENTS);
   const amara = await call(c, "get_fee_balance", { student_id: "CHR-1057", phone: "08000000102" });
-  assert.deepEqual(amara.can_pay, [{ option: "balance", amount: "₦700,000" }], "one payment left: it must clear the term");
+  assert.deepEqual(amara.can_pay, [{ option: "balance", amount: "₦300,000" }], "one payment left: it must clear the term");
   const daniel = await call(c, "get_fee_balance", { student_id: "CHR-1103", phone: "08000000103" });
   assert.deepEqual(daniel.can_pay.map((o: any) => o.option), ["balance", "part"]);
   assert.equal(daniel.can_pay[1].min, "₦100,000");
@@ -206,9 +206,9 @@ test("can_pay lists only what the rules allow: last payment clears, part payment
 });
 
 test("after a failed payment, the retry options follow the rules too", async () => {
-  fakePaystack({ verify: { "CHR-1057-T1-NO": tx({ reference: "CHR-1057-T1-NO", studentId: "CHR-1057", amountNaira: 700_000, status: "failed", gateway: "Insufficient Funds" }) } });
+  fakePaystack({ verify: { "CHR-1057-T1-NO": tx({ reference: "CHR-1057-T1-NO", studentId: "CHR-1057", amountNaira: 300_000, status: "failed", gateway: "Insufficient Funds" }) } });
   const c = await connect("/mcp/parents", PARENTS);
   const r = await call(c, "check_payment", { reference: "CHR-1057-T1-NO" });
-  assert.deepEqual(r.can_pay, [{ option: "balance", amount: "₦700,000" }]);
+  assert.deepEqual(r.can_pay, [{ option: "balance", amount: "₦300,000" }]);
   await c.close();
 });

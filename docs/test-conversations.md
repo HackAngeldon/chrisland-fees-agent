@@ -6,9 +6,9 @@ Run with "today" pinned to 20 October 2026 (`DEMO_TODAY=2026-10-20`) so the bala
 
 1. "Good morning, I want to pay Amara's school fees" → asks for student ID and registered phone.
 2. "CHR-1057, 08000000102" → **verify_parent** → greets Mr Okafor.
-3. → **get_fee_balance** → ₦1,300,000 term, ₦600,000 paid by draft on 8 Sep, ₦700,000 due by 30 Oct.
-4. "Yes, pay the balance" → **create_payment_link** (balance) → Paystack link for ₦700,000 and a reference.
-5. Pay on the Paystack page with a test card, then reply "paid" → **check_payment** → receipt, balance ₦0, paid.
+3. → **get_fee_balance** → ₦1,300,000 term, ₦1,000,000 paid by draft on 8 Sep, ₦300,000 due by 30 Oct; `can_pay` is the balance only (one payment left).
+4. "Yes, pay the balance" → **create_payment_link** (balance) → Paystack link for ₦300,000, the reference, and the note that checkout shows ₦302,000 with Paystack's charge.
+5. On Paystack's test checkout choose **Success** and pay, then reply "paid" → **check_payment** → receipt of ₦300,000 for fees with Paystack's ₦2,000 on its own line, balance ₦0, paid.
 
 ## 2. Part payment and the rules
 
@@ -19,7 +19,7 @@ Run with "today" pinned to 20 October 2026 (`DEMO_TODAY=2026-10-20`) so the bala
 
 ## 3. A failed payment
 
-Pay a link with a failing Paystack test card, then reply "paid" → **check_payment** says it did not go through and no money was taken, and offers a new link.
+Pay a link choosing **Declined** on Paystack's test checkout (test mode also declines amounts over about ₦500,000 as insufficient funds), then reply "paid" → **check_payment** says it did not go through and no money was taken, and offers a new link.
 
 ## 4. Wrong details and the lock
 
@@ -37,4 +37,4 @@ Pay a link with a failing Paystack test card, then reply "paid" → **check_paym
 
 ## 7. The bursar's morning report
 
-Accounts desk teammate, schedule run (or "write the morning fees report") → **outstanding_report**. The report shows: 6 owing, 3 overdue, ₦5,250,000 outstanding, the overdue families first, and drafted reminders.
+Accounts desk teammate, schedule run (or "write the morning fees report") → **outstanding_report**. The report shows: 6 owing, 3 overdue, ₦4,850,000 outstanding, the overdue families first, and drafted reminders.

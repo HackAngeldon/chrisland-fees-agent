@@ -195,13 +195,16 @@ export function planPayment(b: TermBalance, choice: PayChoice, amount?: number, 
 }
 
 /**
- * What Paystack adds when the school passes its fee to parents (local cards
- * and transfers: 1.5%, plus N100 from N2,500, capped at N2,000). Only an
- * estimate for the message before checkout; the receipt uses Paystack's figures.
+ * What Paystack adds when the school passes its fee to parents. Paystack
+ * grosses the fee up so the school nets the exact amount: total =
+ * (amount + N100 from N2,500) / (1 - 1.5%), the fee capped at N2,000.
+ * Measured on the test account: N5,000 -> N5,177.67, N100,000 -> N101,624.37,
+ * N300,000 -> N302,000. Kobo precision; the receipt uses Paystack's figures.
  */
 export function paystackFeeEstimate(amount: number): number {
-  const fee = amount * 0.015 + (amount >= 2_500 ? 100 : 0);
-  return Math.min(2_000, Math.ceil(fee));
+  const total = (amount + (amount >= 2_500 ? 100 : 0)) / (1 - 0.015);
+  const fee = Math.ceil((total - amount) * 100) / 100;
+  return Math.min(2_000, fee);
 }
 
 export type PayOption =

@@ -30,6 +30,13 @@ Each note follows: what happened, how I found the cause, the fix or workaround, 
 - **Second miss, same cause:** With the fix live, I asked for "a new link" in the same chat. The agent called no tool and repeated its earlier wrong offer from the conversation history. Skill v3 tells it to use only the latest `can_pay`, and to call `get_fee_balance` again after any payment attempt. A fresh conversation then behaved. Lesson: stale chat history is as dangerous as a paraphrased rule.
 - **Change in Chord:** A per-reply view showing which skill sentence led to an answer would have made this quicker to trace. "How I did this" shows the tool calls, but not the reasoning between them.
 
+## Paystack's test "Success" declined a N702,000 payment
+
+- **What happened:** The founder paid the agent's N702,000 test link with Paystack's **Success** test option, twice. It came back "declined due to insufficient funds in your bank account".
+- **How I found the cause:** I created untagged test transactions from a local script (the ledger ignores them) and paid each with Success. N5,000, N100,000 and N300,000 (N302,000 charged) all went through; N500,000 (N502,000) was declined. Paystack test mode declines large amounts and reports it as insufficient funds. None of the guides I found mentions it.
+- **Fix:** Amara's invented draft now covers N1,000,000, so her N300,000 balance completes in test mode, and the README says where the limit is. The same probes also measured Paystack's real fee formula: it grosses the fee up so the school nets the exact amount (N5,000 becomes N5,177.67). The estimate now matches that to the kobo.
+- **For a builder:** A "Success" that fails reads as a bug in your own code. One line in Paystack's test docs about the limit would save that hour.
+
 ## Creating a teammate from a skill file
 
 Three small things in one screen (Team > Create a teammate, uploading `skill/` as a ZIP):

@@ -17,7 +17,7 @@ test("every family on the roster, mid first term", () => {
   const cases: [string, number, number, string][] = [
     // id, total, outstanding, status
     ["CHR-1042", 1_300_000, 0, "paid"],
-    ["CHR-1057", 1_300_000, 700_000, "part_paid"],
+    ["CHR-1057", 1_300_000, 300_000, "part_paid"],
     ["CHR-1103", 1_300_000, 1_300_000, "overdue"],
     ["CHR-1150", 1_000_000, 500_000, "part_paid"],
     ["CHR-2011", 1_450_000, 1_450_000, "overdue"], // new pupil: registration and caution on top
@@ -45,7 +45,7 @@ test("online payments count for the right student and term only", () => {
     { term: "2026-27-T2", amount: 900_000, method: "paystack", ref: "CHR-1057-T2-C", date: "2026-10-19", studentId: "CHR-1057" },
   ];
   const b = bal("CHR-1057", MID_TERM, online);
-  assert.deepEqual([b.paid, b.outstanding, b.payments.length, b.paymentsLeft], [800_000, 500_000, 2, 0]);
+  assert.deepEqual([b.paid, b.outstanding, b.payments.length, b.paymentsLeft], [1_200_000, 100_000, 2, 0]);
 });
 
 test("payment rules: full balance, part payments, the last payment, the minimum, overpaying, paying ahead", () => {
@@ -62,7 +62,7 @@ test("payment rules: full balance, part payments, the last payment, the minimum,
 
   // Amara has one payment left this term: it must clear the balance.
   const amara = bal("CHR-1057");
-  const last = planPayment(amara, "part", 300_000);
+  const last = planPayment(amara, "part", 200_000);
   assert.ok(!last.ok && /would be the last/.test(last.reason));
   assert.ok(planPayment(amara, "balance").ok);
 
@@ -106,8 +106,9 @@ test("an empty or malformed DEMO_TODAY falls back to the real Lagos date (found 
   } finally { process.env.DEMO_TODAY = saved; }
 });
 
-test("Paystack's local fee estimate: 1.5% plus N100 from N2,500, capped at N2,000", () => {
+test("Paystack's fee, grossed up as measured on the test account, capped at N2,000", () => {
+  assert.equal(paystackFeeEstimate(5_000), 177.67);
+  assert.equal(paystackFeeEstimate(100_000), 1_624.37);
+  assert.equal(paystackFeeEstimate(300_000), 2_000);
   assert.equal(paystackFeeEstimate(700_000), 2_000);
-  assert.equal(paystackFeeEstimate(100_000), 1_600);
-  assert.equal(paystackFeeEstimate(2_000), 30);
 });

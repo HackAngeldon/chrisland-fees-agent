@@ -60,14 +60,14 @@ Chord needs a **public HTTPS** URL (it blocks loopback). On Render: **New > Blue
 | Student | ID | Registered phone | This term (on 20 Oct 2026) |
 |---|---|---|---|
 | Tobi Adeyemi, Year 4 | CHR-1042 | 0800 000 0101 | Paid in full |
-| Amara Okafor, Year 2 | CHR-1057 | 0800 000 0102 | ₦700,000 left, due 30 Oct (one payment left) |
+| Amara Okafor, Year 2 | CHR-1057 | 0800 000 0102 | ₦300,000 left, due 30 Oct (one payment left) |
 | Daniel Bello, Year 6 | CHR-1103 | 0800 000 0103 | ₦1,300,000 overdue |
 | Aisha Bello, Nursery 2 (Daniel's sister) | CHR-1150 | 0800 000 0103 | ₦500,000 left, due 30 Oct |
 | Emeka Nwosu, Year 3, Lekki (new pupil) | CHR-2011 | 0800 000 0104 | ₦1,450,000 overdue |
 | Kemi Johnson, JSS 2 | CHR-1120 | 0800 000 0105 | ₦800,000 left, due 30 Oct |
 | Zainab Lawal, SS 1 (scholarship) | CHR-1088 | 0800 000 0106 | ₦500,000 overdue |
 
-Pay with one of [Paystack's test cards](https://paystack.com/docs/payments/test-payments/); a failing test card shows the failed-payment path.
+Pay on Paystack's test checkout by choosing **Success** (or **Declined** for the failed-payment path). Paystack's test mode declines larger amounts as "insufficient funds" (₦302,000 went through, ₦502,000 did not), so the demo balances that end in a full payment stay under that: pay Amara's ₦300,000, or a part payment of up to ₦300,000 for Daniel.
 
 ## What is deliberately left out
 

@@ -14,7 +14,7 @@
       "newStudent": false, "scholarship": false,
       "parent": { "name": "Chidi Okafor", "phone": "+2348000000102" },
       "payments": [
-        { "term": "2026-27-T1", "amount": 600000, "method": "bank_draft", "ref": "DRAFT-0099120", "date": "2026-09-08" }
+        { "term": "2026-27-T1", "amount": 1000000, "method": "bank_draft", "ref": "DRAFT-0099120", "date": "2026-09-08" }
       ]
     },
     {
