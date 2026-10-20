@@ -45,12 +45,12 @@ Three small things in one screen (Team > Create a teammate, uploading `skill/` a
 - **The skill is titled "Untitled skill"** although `SKILL.md` declares `name: chrisland-fees-assistant` in its frontmatter, which the docs say is the one required field. It still shows "Untitled skill v1" after publishing. Suggest: use the frontmatter `name` as the title.
 - **"Your session was refreshed, please retry."** The first Create teammate failed with this. Retrying worked, and the teammate list shows no duplicate, so the first request did nothing. Suggest: refresh the session and replay the request (the API already takes an `idempotency_key` for exactly this), instead of making the user resubmit.
 
-## A tool cannot tell who it is acting for (to confirm once credits arrive)
+## A tool cannot tell who it is acting for (confirmed)
 
-- **What happened:** The docs do not say whether a tool call carries the WhatsApp sender or the conversation. For a fees bot that is the difference between "the phone you are writing from proves who you are" and asking every parent to type their phone number.
-- **How I am finding out:** The tool server records every tool call's headers and MCP `_meta` (`CAPTURE_REQUESTS=1`, `GET /debug/requests`). The next step is to read what Chord actually sends from the simulator.
-- **Workaround meanwhile:** Verify by student ID plus registered phone on every call, with a lock after 5 failures.
-- **Change in Chord:** Document it, and offer an opt-in signed header such as `X-Chord-Sender` (channel, sender ID, conversation ID) on tool calls, so tools can authorise per customer.
+- **What happened:** The docs do not say whether a tool call carries the WhatsApp sender or the conversation. For a fees bot, that decides whether "the phone you write from proves who you are" or every parent must type their number.
+- **How I found out:** The tool server logs every tool call's header names and MCP `_meta` (`CAPTURE_REQUESTS=1`). From Chord's in-app chat, all four tools received only transport headers (`authorization`, `user-agent`, `content-type`, Render and Cloudflare proxy headers). `_meta` was `null`: no sender, no conversation ID, no channel. (To re-check from the WhatsApp simulator once it is available.)
+- **Workaround:** Verify by student ID plus registered phone on every call, and lock a student ID after 5 failures. It works, but a parent writing from the very number on file still has to type it.
+- **Change in Chord:** Offer an opt-in signed header on tool calls (for example `X-Chord-Context` with channel, sender ID and conversation ID, HMAC-signed with the server's token), and document it. Tools could then authorise per customer, and reminders could address the right conversation.
 
 ## Proactive messages need a conversation ID nobody can look up
 
