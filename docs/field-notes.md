@@ -27,6 +27,7 @@ Each note follows: what happened, how I found the cause, the fix or workaround, 
 - **What happened:** After a declined card, the agent offered Mr Okafor "a part payment of at least N100,000". That is not allowed: Amara had one payment left that term, so it must clear the balance. The tool would have refused the link, but the offer was already wrong.
 - **Cause:** The skill described the rules, and the model paraphrased them. It took the general minimum and missed the per-family limit.
 - **Fix:** The server now decides. `get_fee_balance` and a failed `check_payment` return `can_pay`, the exact options this family has (here, only the N700,000 balance), and the skill says to offer nothing else. Rules live in code; the prompt only says to follow the tool.
+- **Second miss, same cause:** With the fix live, I asked for "a new link" in the same chat. The agent called no tool and repeated its earlier wrong offer from the conversation history. Skill v3 tells it to use only the latest `can_pay`, and to call `get_fee_balance` again after any payment attempt. A fresh conversation then behaved. Lesson: stale chat history is as dangerous as a paraphrased rule.
 - **Change in Chord:** A per-reply view showing which skill sentence led to an answer would have made this quicker to trace. "How I did this" shows the tool calls, but not the reasoning between them.
 
 ## Creating a teammate from a skill file
