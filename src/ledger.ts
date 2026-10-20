@@ -28,7 +28,14 @@ export function toRecorded(t: Transaction): RecordedPayment | null {
   const term = m.term as TermId | undefined;
   if (t.status !== "success" || m.school !== SCHOOL_TAG || typeof m.student_id !== "string" || !TERMS.some((x) => x.id === term)) return null;
   if (t.currency && t.currency !== "NGN") return null;
-  return { term: term!, amount: Math.round(t.amount / 100), method: "paystack", ref: t.reference, date: (t.paid_at ?? "").slice(0, 10), studentId: m.student_id };
+  // Credit the fees with what the school asked for, not the Paystack fee a parent may pay on top
+  // (found live: a N700,000 link charged N702,000 on an account that passes fees to customers).
+  return { term: term!, amount: Math.round(feesPart(t) / 100), method: "paystack", ref: t.reference, date: (t.paid_at ?? "").slice(0, 10), studentId: m.student_id };
+}
+
+/** Kobo that counts toward school fees: the requested amount when Paystack reports one. */
+export function feesPart(t: Transaction): number {
+  return typeof t.requested_amount === "number" && t.requested_amount > 0 && t.requested_amount <= t.amount ? t.requested_amount : t.amount;
 }
 
 export async function onlinePayments(fresh = false): Promise<RecordedPayment[]> {

@@ -40,10 +40,10 @@ export function fakePaystack(opts: {
 }
 
 /** A successful school fees transaction as Paystack returns it. */
-export function tx(p: { reference: string; studentId: string; amountNaira: number; status?: string; term?: string; school?: string; gateway?: string }): Transaction {
+export function tx(p: { reference: string; studentId: string; amountNaira: number; status?: string; term?: string; school?: string; gateway?: string; feeNaira?: number }): Transaction {
   return {
     id: Math.floor(Math.random() * 1e9), reference: p.reference, status: p.status ?? "success",
-    amount: p.amountNaira * 100, currency: "NGN", paid_at: p.status && p.status !== "success" ? null : "2026-10-20T10:15:00.000Z",
+    amount: (p.amountNaira + (p.feeNaira ?? 0)) * 100, ...(p.feeNaira ? { requested_amount: p.amountNaira * 100 } : {}), currency: "NGN", paid_at: p.status && p.status !== "success" ? null : "2026-10-20T10:15:00.000Z",
     channel: "card", gateway_response: p.gateway ?? (p.status === "failed" ? "Declined" : "Successful"),
     metadata: { school: p.school ?? "chrisland-demo", student_id: p.studentId, term: p.term ?? "2026-27-T1", purpose: "school_fees" },
   };

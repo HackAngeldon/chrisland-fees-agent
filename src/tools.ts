@@ -17,11 +17,12 @@
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import {
-  POLICY, SESSION, STUDENTS, currentTerm, naira, nextTerm, parentEmail, planPayment, termBalance, verifyParent,
+  POLICY, SESSION, STUDENTS, currentTerm, naira, nextTerm, parentEmail, payOptions, paystackFeeEstimate, planPayment, termBalance, verifyParent,
+  type PayOption,
   type Student, type TermBalance, type TermId,
 } from "./school.js";
 import { PaystackError, initializePayment, verifyPayment } from "./paystack.js";
-import { SCHOOL_TAG, forgetCache, onlinePayments, toRecorded } from "./ledger.js";
+import { SCHOOL_TAG, feesPart, forgetCache, onlinePayments, toRecorded } from "./ledger.js";
 import { capture } from "./capture.js";
 
 /** Today in Lagos as YYYY-MM-DD. DEMO_TODAY pins it for tests and the recording. */
@@ -34,6 +35,14 @@ export function today(): string {
 
 type Json = Record<string, unknown>;
 const reply = (data: Json) => ({ content: [{ type: "text" as const, text: JSON.stringify(data) }] });
+
+/** PARENT_PAYS_PAYSTACK_FEE=1 when the school's Paystack account passes its fee to customers. */
+const parentPaysFee = () => process.env.PARENT_PAYS_PAYSTACK_FEE?.trim() === "1";
+
+const optionView = (o: PayOption) =>
+  o.option === "balance" ? { option: "balance", amount: naira(o.amount) }
+  : o.option === "part" ? { option: "part", min: naira(o.min), max: naira(o.max), note: o.note }
+  : { option: "next_term", amount: naira(o.amount), term: o.term };
 
 /** What a parent hears when Paystack is the problem. Never the raw error, never a key. */
 function paystackTrouble(e: unknown): Json {
@@ -130,6 +139,8 @@ export function registerParentTools(server: McpServer) {
       session: SESSION, today: day,
       current_term: termView(b),
       next_term: nb ? { term: nb.term.name, term_id: nb.term.id, fees_due: nb.term.feesDue, total: naira(nb.total), outstanding: naira(nb.outstanding) } : null,
+      can_pay: payOptions(b, nb).map(optionView),
+      can_pay_note: "Offer only these options. Anything else needs the accounts office.",
       part_payment_rules: {
         max_payments_per_term: POLICY.maxPaymentsPerTerm, min_part_payment: naira(POLICY.minPartPayment),
         clear_by: b.term.clearBy, note: "A part-paid term must be cleared by the clear-by date.",
@@ -180,7 +191,10 @@ export function registerParentTools(server: McpServer) {
           ],
         },
       });
+      const fee = parentPaysFee() ? paystackFeeEstimate(plan.amount) : 0;
       return reply({ ok: true, link: r.authorization_url, reference: r.reference, amount: naira(plan.amount), covers: plan.covers,
+        ...(fee ? { checkout_total: naira(plan.amount + fee), paystack_charge: naira(fee),
+          say_about_charge: `Paystack adds its charge of ${naira(fee)} at checkout, so the page shows ${naira(plan.amount + fee)}. The school receives ${naira(plan.amount)} for the fees.` } : {}),
         note: "Test mode: no real money moves. The link is for this amount only." });
     } catch (e) {
       return reply(paystackTrouble(e));
@@ -218,7 +232,8 @@ export function registerParentTools(server: McpServer) {
           receipt_number: t.reference,
           student: student ? `${student.name} (${student.id}), ${student.class}` : String(m.student_id),
           for: rec ? `${after?.term.name ?? rec.term} ${SESSION}` : SESSION,
-          amount: naira(Math.round(t.amount / 100)),
+          amount: naira(Math.round(feesPart(t) / 100)),
+          ...(t.amount > feesPart(t) ? { paystack_charge: naira(Math.round((t.amount - feesPart(t)) / 100)), total_charged: naira(Math.round(t.amount / 100)) } : {}),
           paid_at: t.paid_at,
           method: t.channel ?? "online",
         },
@@ -226,8 +241,19 @@ export function registerParentTools(server: McpServer) {
       });
     }
     if (t.status === "failed") {
+      let options: PayOption[] = [];
+      try {
+        const rec = { term: m.term } as { term?: string };
+        if (student && rec.term) {
+          const online = await onlinePayments(true);
+          const b = termBalance(student, rec.term as TermId, online, today());
+          const nt = nextTerm(b.term);
+          options = payOptions(b, nt ? termBalance(student, nt.id, online, today()) : null);
+        }
+      } catch { /* the failure still stands without the options */ }
       return reply({ paid: false, state: "failed", reason: t.gateway_response ?? "Declined",
-        say: "The payment did not go through, and no money was taken. You can try again with a new link, or use another card or bank transfer." });
+        say: "The payment did not go through, and no money was taken. You can try again with a new link, or use another card or bank transfer.",
+        can_pay: options.map(optionView), can_pay_note: "Offer only these options for the retry." });
     }
     if (t.status === "reversed") {
       return reply({ paid: false, state: "reversed", say: "This payment was reversed. The accounts office will contact you.", escalate: true });

@@ -25,3 +25,5 @@ services:
         value: https://chrisland-fees-agent.onrender.com
       - key: CAPTURE_REQUESTS
         value: "1"
+      - key: PARENT_PAYS_PAYSTACK_FEE # the demo's Paystack account passes its fee to customers
+        value: "1"

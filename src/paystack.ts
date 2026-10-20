@@ -82,7 +82,10 @@ export interface Transaction {
   reference: string;
   /** success | failed | abandoned | ongoing | pending | processing | queued | reversed */
   status: string;
-  amount: number; // kobo
+  /** Kobo, what the customer was charged: includes Paystack's fee when the account passes fees to customers. */
+  amount: number;
+  /** Kobo, what the merchant asked for, before any fee passed to the customer. */
+  requested_amount?: number;
   currency: string;
   paid_at: string | null;
   created_at?: string;

@@ -1,7 +1,7 @@
 /** The fee rules and balance arithmetic, on the invented roster, on fixed dates. */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { findStudent, normalisePhone, parentEmail, planPayment, termBalance, termTotal, verifyParent, type RecordedPayment } from "../src/school.ts";
+import { findStudent, normalisePhone, parentEmail, paystackFeeEstimate, planPayment, termBalance, termTotal, verifyParent, type RecordedPayment } from "../src/school.ts";
 
 const MID_TERM = "2026-10-20"; // first term, before the 30 Oct clear-by date
 const s = (id: string) => findStudent(id)!;
@@ -104,4 +104,10 @@ test("an empty or malformed DEMO_TODAY falls back to the real Lagos date (found 
     process.env.DEMO_TODAY = "2026-10-20";
     assert.equal(today(), "2026-10-20");
   } finally { process.env.DEMO_TODAY = saved; }
+});
+
+test("Paystack's local fee estimate: 1.5% plus N100 from N2,500, capped at N2,000", () => {
+  assert.equal(paystackFeeEstimate(700_000), 2_000);
+  assert.equal(paystackFeeEstimate(100_000), 1_600);
+  assert.equal(paystackFeeEstimate(2_000), 30);
 });

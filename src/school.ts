@@ -194,6 +194,35 @@ export function planPayment(b: TermBalance, choice: PayChoice, amount?: number, 
   return { ok: true, amount: n, termId: b.term.id, covers: `${b.term.name} ${SESSION}, part payment (${naira(b.outstanding - n)} left, due by ${b.term.clearBy})` };
 }
 
+/**
+ * What Paystack adds when the school passes its fee to parents (local cards
+ * and transfers: 1.5%, plus N100 from N2,500, capped at N2,000). Only an
+ * estimate for the message before checkout; the receipt uses Paystack's figures.
+ */
+export function paystackFeeEstimate(amount: number): number {
+  const fee = amount * 0.015 + (amount >= 2_500 ? 100 : 0);
+  return Math.min(2_000, Math.ceil(fee));
+}
+
+export type PayOption =
+  | { option: "balance"; amount: number }
+  | { option: "part"; min: number; max: number; note: string }
+  | { option: "next_term"; amount: number; term: string };
+
+/** The ways this family may pay now, decided here so the model never paraphrases a rule wrongly. */
+export function payOptions(b: TermBalance, next: TermBalance | null): PayOption[] {
+  const out: PayOption[] = [];
+  if (b.outstanding > 0) {
+    out.push({ option: "balance", amount: b.outstanding });
+    if (b.paymentsLeft >= 2 && b.outstanding > POLICY.minPartPayment) {
+      out.push({ option: "part", min: POLICY.minPartPayment, max: b.outstanding - 1, note: `The rest is due by ${b.term.clearBy}.` });
+    }
+  } else if (next && next.outstanding > 0) {
+    out.push({ option: "next_term", amount: next.outstanding, term: next.term.name });
+  }
+  return out;
+}
+
 export const fmt = (n: number) => n.toLocaleString("en-NG");
 /** "₦1,300,000": how money reads in a WhatsApp message. */
 export const naira = (n: number) => `₦${fmt(n)}`;

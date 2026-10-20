@@ -15,6 +15,20 @@ Each note follows: what happened, how I found the cause, the fix or workaround, 
 - **How I found it:** It was not in the inbox; I found it in Spam.
 - **Change in Chord:** Check SPF, DKIM and DMARC alignment for the sending domain, and say "check your spam folder" on the code screen.
 
+## The agent quoted N700,000; Paystack charged N702,000
+
+- **What happened:** In the first live run, the agent sent a link for Amara's N700,000 balance. Paystack's checkout asked for **N702,000**. The test Paystack account passes Paystack's fee to customers, so checkout adds it on top.
+- **How I found the cause:** I read the transaction back from Paystack: `amount` was 70,200,000 kobo and `requested_amount` was 70,000,000. Our ledger counted `amount`, so a paid term would have read N2,000 overpaid, and the receipt would have said N702,000 against fees.
+- **Fix:** Fees are now credited with `requested_amount`. The receipt shows "Paystack charge N2,000" and the total charged as separate lines. The link message tells the parent upfront what checkout will show (`PARENT_PAYS_PAYSTACK_FEE=1`). A test covers each part.
+- **Change in Chord:** Not Chord's bug, but a real go-live trap. If Chord's Paystack connector or docs had a note on fee bearers, the next builder would ask "who pays the fee?" before the first parent does.
+
+## The model offered a payment the rules do not allow
+
+- **What happened:** After a declined card, the agent offered Mr Okafor "a part payment of at least N100,000". That is not allowed: Amara had one payment left that term, so it must clear the balance. The tool would have refused the link, but the offer was already wrong.
+- **Cause:** The skill described the rules, and the model paraphrased them. It took the general minimum and missed the per-family limit.
+- **Fix:** The server now decides. `get_fee_balance` and a failed `check_payment` return `can_pay`, the exact options this family has (here, only the N700,000 balance), and the skill says to offer nothing else. Rules live in code; the prompt only says to follow the tool.
+- **Change in Chord:** A per-reply view showing which skill sentence led to an answer would have made this quicker to trace. "How I did this" shows the tool calls, but not the reasoning between them.
+
 ## Creating a teammate from a skill file
 
 Three small things in one screen (Team > Create a teammate, uploading `skill/` as a ZIP):
