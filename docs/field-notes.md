@@ -15,6 +15,20 @@ Each note follows: what happened, how I found the cause, the fix or workaround, 
 - **How I found it:** It was not in the inbox; I found it in Spam.
 - **Change in Chord:** Check SPF, DKIM and DMARC alignment for the sending domain, and say "check your spam folder" on the code screen.
 
+## The bursar's teammate never called its tool, and its runs held my credits
+
+- **What happened:** The Accounts Desk teammate, pinned through the API to the bursar MCP server, answered "Write the morning fees report" with "Pulling the outstanding fees data now", then nothing. Three tries, two conversations. No `outstanding_report` call reached the server (Render logs). The parents' teammate on the other server worked throughout.
+- **What I checked:** Health on the bursar server: ok, 752 ms. Discovery: `outstanding_report` listed. Teammate read-back: `mcp_server_ids` holds the bursar server. The server was created disabled, assigned, then enabled, so a teammate never saw it before it was pinned.
+- **The second effect:** Credits used read 0.89, all by the Fees Assistant. But the available balance fell from 9.23 to 2.99, with the rest "held for active runs", and the app showed "You're out of credits". No active run is visible in Activity or Needs you, and nothing can be cancelled.
+- **Status:** Reported to TSG Labs straight away, as the brief asks. I stopped testing so nothing else gets held.
+- **Change in Chord:** Show active runs with their held credits, and let an admin cancel one. Release holds when a run ends without a tool call. When an assigned MCP tool is not offered to the model, say why in "How I did this".
+
+## Per-teammate MCP assignment is API-only, and keys cannot list servers
+
+- **What happened:** The app's teammate settings list only first-party connectors, so in the app every teammate silently gets every enabled MCP server. Assignment exists only as `PUT /v1/teammates/{id}` with `set_mcp_server_ids`. The API key screen offers no MCP scopes, so a scoped key gets 403 on listing servers. I took the server IDs from the app's own requests, then pinned with a Teammates Read + Update key (`scripts/chord.ts`).
+- **Also:** The teammate record omits `mcp_server_ids` while it is empty, so "every server" and "not set" look the same until you pin one.
+- **Change in Chord:** Add an MCP section to teammate settings, and MCP scopes to the key screen. Make "empty means all" an explicit choice, not a silent default.
+
 ## The agent quoted N700,000; Paystack charged N702,000
 
 - **What happened:** In the first live run, the agent sent a link for Amara's N700,000 balance. Paystack's checkout asked for **N702,000**. The test Paystack account passes Paystack's fee to customers, so checkout adds it on top.
