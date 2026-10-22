@@ -2,8 +2,8 @@
 
 Record in the WhatsApp simulator, which gives a fresh customer with no Chord memory. Reset the balances first (`LEDGER_TAG`) and open `/health` a minute before, so the server is awake. You do the clicks on Paystack's checkout.
 
-- **Parents:** https://chat.tsglabs.dev/c/KSh-5zrHaMFo_H3HGDl_hf4Y (Fees Assistant). Enter "Mrs Bello" as the name. If a chat is already open, tap ↻ for a fresh one: an old chat keeps its old formatting.
-- **Bursar:** https://chat.tsglabs.dev/c/scgS6Hu85gUj8QZq0tJf9XJw (Accounts Desk). Enter "Bursar" as the name.
+- **Parents:** the Fees Assistant's simulator link (kept out of this public repo). Enter "Mrs Bello" as the name. If a chat is already open, tap ↻ for a fresh one: an old chat keeps its old formatting.
+- **Bursar:** the Accounts Desk's simulator link. Enter "Bursar" as the name.
 
 | Time | Show | Say (roughly) |
 |---|---|---|

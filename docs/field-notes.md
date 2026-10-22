@@ -1,6 +1,6 @@
 # Deployment field notes
 
-Three problems first: the ones that cost the most time, or would cost the next builder. Each says what happened, how I found the cause, what I did, and what I would change in Chord. Smaller things follow as a list.
+The three problems that cost the most time, or would cost the next builder. Each says what happened, how I found the cause, what I did, and what I would change in Chord.
 
 ## 1. Chord does not tell a tool who it is acting for
 
@@ -35,21 +35,8 @@ Three problems first: the ones that cost the most time, or would cost the next b
   - Release the hold when a run ends without a tool call.
   - When an assigned tool is not offered to the model, say why in "How I did this".
 
-## Integration lessons (not Chord's bugs, but they shaped the build)
+## Also hit (one line each)
 
-- **₦700,000 quoted, ₦702,000 charged.** The test Paystack account passes its fee to customers. Reading the transaction back showed `amount` 70,200,000 kobo against `requested_amount` 70,000,000. Fees are now credited with `requested_amount`, and the receipt shows Paystack's charge on its own line. The payment link says upfront what checkout will show.
-- **Paystack test "Success" declined large amounts.** Two ₦702,000 payments came back as "insufficient funds". Untagged probes from a local script, which the ledger ignores, put the limit between ₦302,000 (paid) and ₦502,000 (declined). They also measured Paystack's grossed-up fee formula: ₦5,000 becomes ₦5,177.67, which the estimate now matches to the kobo.
-- **The model offered a payment the rules do not allow.** After a declined card, it offered a part payment to a family with one payment left that term. The rules now live in code: `get_fee_balance` returns `can_pay`, the exact options for this family, and the skill offers nothing else. The same fault came back once from stale chat history, so skill v3 re-checks the balance after any payment attempt.
-
-## Smaller things
-
-- **Markdown reached WhatsApp as raw asterisks.** In the simulator, balances read `**₦1,300,000**`: WhatsApp bold is one asterisk, and Chord passed the model's Markdown through unchanged. Chord's own in-app chat renders Markdown, so it only showed on the WhatsApp channel. I fixed it in the skills (Fees Assistant v4, Accounts Desk v2), and a fresh chat then showed real bold. A chat that had already started kept the old style from its own history. In Chord, I would convert Markdown to WhatsApp formatting at the channel, or tell the model which channel it is writing to.
-
-- **Onboarding cut my business description silently.** It was cut mid-sentence at 500 characters, with no counter or warning, and the last sentence lost was my disclaimer.
-- **The sign-in code email landed in Gmail's spam folder.**
-- **Creating a teammate from `SKILL.md` had three quirks:**
-  - Role was pre-filled with half a sentence from the instructions ("AI assistant: if anyone asks").
-  - The skill showed as "Untitled skill", despite its frontmatter `name`.
-  - The first create failed with "Your session was refreshed, please retry". It made no duplicate; the API already takes an `idempotency_key` for exactly this.
-- **The docs index covers MCP tools only.** The app also offers Custom tools (API), with OpenAPI import.
-- **The sidebar showed "10 credits" while the balance was 9.8.**
+- **Paystack passed its fee to the parent** (₦700,000 quoted, ₦702,000 charged): fees are now credited from `requested_amount`, with Paystack's charge on its own receipt line.
+- **The model once offered a payment the rules forbid:** the rules moved into code (`get_fee_balance` returns `can_pay`), and the skill offers nothing else.
+- **Chord passed Markdown to WhatsApp unchanged,** so bold showed as `**₦1,300,000**`: fixed in both skills; Chord could convert Markdown at the channel instead.
