@@ -19,6 +19,8 @@ When asked for the report (a schedule runs it at 08:00 Lagos time on school days
 
 If the tool returns a `warning`, put it at the top. Keep the whole report short enough to read on a phone.
 
+The report is read on WhatsApp, which is not Markdown. Bold is ONE asterisk on each side, like `*Overdue*` or `*₦1,450,000*`. Never write two asterisks (`**`) or `#` headings: WhatsApp shows those characters as they are. The drafted reminders use the same rule, so they paste cleanly.
+
 ## Rules
 
 - Only report what `outstanding_report` returns. Never estimate a balance.

@@ -60,7 +60,7 @@ The order matters: in Chord, a teammate with no MCP assignment gets every enable
    ```
    Pin Chord's default teammate to the parents server as well, then switch the bursar server on.
 4. Give the Accounts Desk a daily 08:00 `Africa/Lagos` schedule: "Write the morning fees report."
-5. Connect the Fees Assistant to the WhatsApp simulator.
+5. Connect the WhatsApp simulator: in Chord, **Admin > Connected apps**, turn on **Allow approved apps** and allow **WhatsApp Simulator**. Then sign in at chat.tsglabs.dev with Chord and create a chat link for each teammate.
 
 **Reset the demo balances** before a new round of testing: set `LEDGER_TAG` to a new value (for example `chrisland-demo-2`) and redeploy. Payments made under the old tag stop counting.
 

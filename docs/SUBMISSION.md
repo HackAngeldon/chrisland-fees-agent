@@ -16,6 +16,10 @@ It is worth paying for because every naira collected on time is cash the school 
 
 The agent is live in the Chord workspace **Chrisland Schools (demo)**, as the teammate **Fees Assistant**. The **Accounts Desk** teammate handles the bursar's report. Test data, with student IDs and registered phones, is in the README.
 
+Try it in the WhatsApp simulator:
+- **As a parent:** https://chat.tsglabs.dev/c/KSh-5zrHaMFo_H3HGDl_hf4Y (for example "How much is left on Daniel's fees? CHR-1103, 0800 000 0103").
+- **As the bursar:** https://chat.tsglabs.dev/c/scgS6Hu85gUj8QZq0tJf9XJw ("Please give me this morning's list of everyone who still owes fees").
+
 ## 3. Code
 
 https://github.com/HackAngeldon/chrisland-fees-agent
